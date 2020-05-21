@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,9 +23,8 @@ namespace Microsoft.EntityFrameworkCore
         /// </summary>
         /// <param name="index"> The index. </param>
         /// <returns> The name for this index. </returns>
-        public static string GetName([NotNull] this IIndex index) =>
-            (string)index[RelationalAnnotationNames.Name]
-            ?? index.GetDefaultName();
+        public static string GetName([NotNull] this IIndex index)
+            => index.Name ?? index.GetDefaultName();
 
         /// <summary>
         ///     Returns the default name that would be used for this index.
@@ -48,10 +48,9 @@ namespace Microsoft.EntityFrameworkCore
         /// </summary>
         /// <param name="index"> The index. </param>
         /// <param name="name"> The value to set. </param>
+        [Obsolete("Use IMutableIndex.Name instead.")]
         public static void SetName([NotNull] this IMutableIndex index, [CanBeNull] string name)
-            => index.SetOrRemoveAnnotation(
-                RelationalAnnotationNames.Name,
-                Check.NullButNotEmpty(name, nameof(name)));
+            => index.Name = Check.NullButNotEmpty(name, nameof(name));
 
         /// <summary>
         ///     Sets the index name.
@@ -60,23 +59,18 @@ namespace Microsoft.EntityFrameworkCore
         /// <param name="name"> The value to set. </param>
         /// <param name="fromDataAnnotation"> Indicates whether the configuration was specified using a data annotation. </param>
         /// <returns> The configured value. </returns>
+        [Obsolete("Use IConventionIndex.SetName() instead.")]
         public static string SetName([NotNull] this IConventionIndex index, [CanBeNull] string name, bool fromDataAnnotation = false)
-        {
-            index.SetOrRemoveAnnotation(
-                RelationalAnnotationNames.Name,
-                Check.NullButNotEmpty(name, nameof(name)),
-                fromDataAnnotation);
-
-            return name;
-        }
+            => index.SetName(Check.NullButNotEmpty(name, nameof(name)), fromDataAnnotation);
 
         /// <summary>
         ///     Gets the <see cref="ConfigurationSource" /> for the index name.
         /// </summary>
         /// <param name="index"> The index. </param>
         /// <returns> The <see cref="ConfigurationSource" /> for the index name. </returns>
+        [Obsolete("Use IConventionIndex.GetNameConfigurationSource() instead.")]
         public static ConfigurationSource? GetNameConfigurationSource([NotNull] this IConventionIndex index)
-            => index.FindAnnotation(RelationalAnnotationNames.Name)?.GetConfigurationSource();
+            => index.GetNameConfigurationSource();
 
         /// <summary>
         ///     Returns the index filter expression.
